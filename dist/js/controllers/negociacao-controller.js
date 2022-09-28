@@ -12,9 +12,9 @@ export class NegociacaoController {
     }
     adiciona() {
         const negociacao = this.criaNegociacao();
-        this.limparForm();
         this._negociacoes.adiciona(negociacao);
         this._negociacaoView.update(this._negociacoes);
+        this.limparForm();
     }
     criaNegociacao() {
         const exp = /-/g;
