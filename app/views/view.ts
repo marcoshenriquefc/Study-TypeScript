@@ -1,4 +1,4 @@
-export class View<T>{
+export abstract class View<T>{
 
     protected _elemento: HTMLElement;
 
@@ -6,9 +6,7 @@ export class View<T>{
         this._elemento = document.querySelector(seletor);
     }
 
-    template(mensagem: T): string{
-        throw Error('Classe filha precisa de template');
-    }
+    protected abstract template(mensagem: T): string;
 
     update(mensagem: T): void{
         const template = this.template(mensagem);
