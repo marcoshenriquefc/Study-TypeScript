@@ -30,7 +30,7 @@ export class NegociacaoView extends View<Negociacoes>{
         `
     }
 
-    update(modelo: Negociacoes): void{
+    public update(modelo: Negociacoes): void{
         this._elemento.innerHTML = this.template(modelo);
     }
 }
