@@ -5,7 +5,12 @@ import { NegociacaoView } from "./views/negociacao-view.js";
 const negociacao = new NegociacaoController()
 const form = document.querySelector('.form');
 
-form.addEventListener('submit', (event)=>{
-    event.preventDefault();
-    negociacao.adiciona()
-})
+if(form){
+    form.addEventListener('submit', (event)=>{
+        event.preventDefault();
+        negociacao.adiciona()
+    })
+}
+else{
+    throw Error('Erro! verifique se o Form Existe ')
+}
