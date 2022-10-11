@@ -8,9 +8,9 @@ export function inspect(){
         descriptor.value = function (...args: Array<any>){
             const retorno = metodoOriginal.apply(this, args)
 
-            console.log(`--- Método: ${propertyKey}`);
-            console.log(`------Parâmetros: ${JSON.stringify(args)}`);
-            console.log(`------Retorno: ${JSON.stringify(retorno)}`);
+            // console.log(`--- Método: ${propertyKey}`);
+            // console.log(`------Parâmetros: ${JSON.stringify(args)}`);
+            // console.log(`------Retorno: ${JSON.stringify(retorno)}`);
 
             return retorno;
         }

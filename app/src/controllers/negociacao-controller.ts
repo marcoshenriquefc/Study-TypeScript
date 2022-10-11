@@ -20,9 +20,6 @@ export class NegociacaoController {
     private mensagemView = new MensagemView('#mensagemView');
 
     constructor() {
-        // this.inputData = <HTMLInputElement>document.querySelector('#data');
-        // this.inputQuantidade = document.querySelector('#quantidade') as HTMLInputElement;
-        // this.inputValor = document.querySelector('#valor') as HTMLInputElement;
         this.negociacoesView.update(this.negociacoes);
     }
 
@@ -45,6 +42,26 @@ export class NegociacaoController {
         this.negociacoes.adiciona(negociacao);
         this.limparFormulario();
         this.atualizaView();
+    }
+
+    public inportarDados():void{
+        fetch('http://localhost:8080/dados')
+            .then( response => response.json())
+            .then( (dados: any[]) => {
+                console.log(dados)
+
+                let teste = dados.map( dado =>{
+                    return new Negociacao(new Date(), dado.vezes, dado.montante);
+                })
+
+                teste.forEach(negociacao =>{
+                    this.negociacoes.adiciona(negociacao);
+                });
+
+                this.negociacoesView.update(this.negociacoes);
+                
+
+            })
     }
 
     private ehDiaUtil(data: Date) {

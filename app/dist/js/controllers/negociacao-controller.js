@@ -30,6 +30,20 @@ export class NegociacaoController {
         this.limparFormulario();
         this.atualizaView();
     }
+    inportarDados() {
+        fetch('http://localhost:8080/dados')
+            .then(response => response.json())
+            .then((dados) => {
+            console.log(dados);
+            let teste = dados.map(dado => {
+                return new Negociacao(new Date(), dado.vezes, dado.montante);
+            });
+            teste.forEach(negociacao => {
+                this.negociacoes.adiciona(negociacao);
+            });
+            this.negociacoesView.update(this.negociacoes);
+        });
+    }
     ehDiaUtil(data) {
         return data.getDay() > DiasDaSemana.DOMINGO
             && data.getDay() < DiasDaSemana.SABADO;
