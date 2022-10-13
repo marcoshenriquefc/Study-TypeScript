@@ -10,6 +10,8 @@ import { logarTempoExecucao } from '../decorator/logar-tempo-execucao.js';
 import { DiasDaSemana } from '../enums/dias-da-semana.js';
 import { Negociacao } from '../models/negociacao.js';
 import { Negociacoes } from '../models/negociacoes.js';
+import { negociacaoService } from '../services/negociacoes-service.js';
+import { imprimir } from '../utils/imprimir.js';
 import { MensagemView } from '../views/mensagem-view.js';
 import { NegociacoesView } from '../views/negociacoes-view.js';
 export class NegociacaoController {
@@ -17,6 +19,7 @@ export class NegociacaoController {
         this.negociacoes = new Negociacoes();
         this.negociacoesView = new NegociacoesView('#negociacoesView');
         this.mensagemView = new MensagemView('#mensagemView');
+        this.negociacaoService = new negociacaoService();
         this.negociacoesView.update(this.negociacoes);
     }
     adiciona() {
@@ -29,19 +32,26 @@ export class NegociacaoController {
         this.negociacoes.adiciona(negociacao);
         this.limparFormulario();
         this.atualizaView();
+        imprimir(negociacao, this.negociacoes);
     }
     inportarDados() {
-        fetch('http://localhost:8080/dados')
-            .then(response => response.json())
-            .then((dados) => {
-            console.log(dados);
-            let teste = dados.map(dado => {
-                return new Negociacao(new Date(), dado.vezes, dado.montante);
+        this.negociacaoService.obterNegociacoes()
+            .then(negociacoesDados => {
+            return negociacoesDados.filter(negociacoesDados => {
+                return !this.negociacoes
+                    .lista()
+                    .some(Negociacao => Negociacao.ehigual(negociacoesDados));
             });
-            teste.forEach(negociacao => {
+        })
+            .then(negociacoesDados => {
+            negociacoesDados.forEach(negociacao => {
                 this.negociacoes.adiciona(negociacao);
             });
             this.negociacoesView.update(this.negociacoes);
+            this.mensagemView.update('Importado com sucesso');
+        })
+            .catch(err => {
+            this.mensagemView.update('ERRO NA IMPORTAÇÃO');
         });
     }
     ehDiaUtil(data) {

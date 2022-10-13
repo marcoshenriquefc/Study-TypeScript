@@ -4,6 +4,8 @@ import { logarTempoExecucao } from '../decorator/logar-tempo-execucao.js';
 import { DiasDaSemana } from '../enums/dias-da-semana.js';
 import { Negociacao } from '../models/negociacao.js';
 import { Negociacoes } from '../models/negociacoes.js';
+import { negociacaoService } from '../services/negociacoes-service.js';
+import { imprimir } from '../utils/imprimir.js';
 import { MensagemView } from '../views/mensagem-view.js';
 import { NegociacoesView } from '../views/negociacoes-view.js';
 
@@ -18,6 +20,7 @@ export class NegociacaoController {
     private negociacoes = new Negociacoes();
     private negociacoesView = new NegociacoesView('#negociacoesView');
     private mensagemView = new MensagemView('#mensagemView');
+    private negociacaoService = new negociacaoService();
 
     constructor() {
         this.negociacoesView.update(this.negociacoes);
@@ -42,26 +45,29 @@ export class NegociacaoController {
         this.negociacoes.adiciona(negociacao);
         this.limparFormulario();
         this.atualizaView();
+
+        imprimir(negociacao, this.negociacoes );
     }
 
     public inportarDados():void{
-        fetch('http://localhost:8080/dados')
-            .then( response => response.json())
-            .then( (dados: any[]) => {
-                console.log(dados)
-
-                let teste = dados.map( dado =>{
-                    return new Negociacao(new Date(), dado.vezes, dado.montante);
-                })
-
-                teste.forEach(negociacao =>{
-                    this.negociacoes.adiciona(negociacao);
-                });
-
-                this.negociacoesView.update(this.negociacoes);
-                
-
+        this.negociacaoService.obterNegociacoes()
+        .then(negociacoesDados => {
+            return negociacoesDados.filter(negociacoesDados =>{
+                return !this.negociacoes
+                .lista()
+                .some(Negociacao => Negociacao.ehigual(negociacoesDados))
             })
+        })
+        .then(negociacoesDados  =>{
+            negociacoesDados.forEach(negociacao =>{
+                this.negociacoes.adiciona(negociacao);
+            });
+            this.negociacoesView.update(this.negociacoes)
+            this.mensagemView.update('Importado com sucesso')
+        })
+        .catch(err => {
+            this.mensagemView.update('ERRO NA IMPORTAÇÃO')
+        })
     }
 
     private ehDiaUtil(data: Date) {
